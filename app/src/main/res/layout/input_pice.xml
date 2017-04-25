@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
-            name="inputModel"
+            name="priceModel"
             type="com.drawingboardapps.appetizecode.viewmodel.VMPriceInput" />
     </data>
 
@@ -16,8 +17,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/hint_init_zero"
-            android:text="@{inputModel.text}"
-            android:inputType="none"
+            android:text="@{priceModel.text}"
+            android:inputType="numberDecimal"
+            android:enabled="false"
             android:layout_weight="2"/>
 
         <Button
@@ -26,6 +28,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/btn_submit"
-            android:onClick="@{inputModel.submit}"/>
+            android:onClick="@{priceModel.submit}"/>
     </LinearLayout>
 </layout>

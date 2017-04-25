@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AppetizeCode</string>
+    <string name="app_name">TransactionDemo</string>
     <string name="hint_init_zero">$0.00</string>
     <string name="btn_submit">Submit</string>
 
@@ -16,6 +16,7 @@
     <string name="number_nine">9</string>
     <string name="btn_clear">Clear</string>
     <string name="btn_backspace">Back</string>
+    <string name="txt_invalid_amt">Amount invalid!</string>
 
 
 </resources>

@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+        xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="priceModel"
+            type="com.drawingboardapps.appetizecode.viewmodel.VMPriceInput"/>
+        <variable
+            name="keyboardModel"
+            type="com.drawingboardapps.appetizecode.viewmodel.VMKeyboard"/>
+        <variable
+            name="buttonBarModel"
+            type="com.drawingboardapps.appetizecode.viewmodel.VMButtonBar"/>
+    </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,12 +24,14 @@
         <include
             android:id="@+id/input_price_bar"
             layout="@layout/input_pice"
+            bind:priceModel="@{priceModel}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <include
             android:id="@+id/select_item_bar"
             layout="@layout/chooser_bar"
+            bind:buttonBarModel="@{buttonBarModel}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/input_price_bar"
@@ -25,6 +40,7 @@
         <include
             android:id="@+id/input_keyboard"
             layout="@layout/keyboard"
+            bind:keyboardModel="@{keyboardModel}"
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

@@ -1,19 +1,41 @@
 package com.drawingboardapps.transactionsdk;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 /**
  * Created by Zach on 4/23/2017.
  */
 
-public class TransactionRequest {
+public class TransactionRequest implements Serializable{
 
+    private String discount;
     private String localTransId;
     private String subtotal;
     private String tax;
     private String total;
+    private String timeMillis;
+
     //<item_key, price (ex 2@10.00)>
-    private LinkedHashMap<String, String> lineItems;
+    private LinkedList<LineItem> lineItems;
+
+    public TransactionRequest(){}
+
+    public TransactionRequest(BigDecimal subtotal,
+                              BigDecimal tax,
+                              BigDecimal total,
+                              BigDecimal discount,
+                              LinkedList<LineItem> lineitems,
+                              String timeMillis) {
+
+        this.subtotal = subtotal.toString();
+        this.tax = tax.toString();
+        this.discount = discount.toString();
+        this.lineItems = lineitems;
+    }
 
     public String getLocalTransId() {
         return localTransId;
@@ -47,12 +69,19 @@ public class TransactionRequest {
         this.total = total;
     }
 
-    public LinkedHashMap<String, String> getLineItems() {
+    public LinkedList<LineItem> getLineItems() {
         return lineItems;
     }
 
-    public void setLineItems(LinkedHashMap<String, String> lineItems) {
+    public void setLineItems(LinkedList<LineItem> lineItems) {
         this.lineItems = lineItems;
     }
 
+    public String getTimeMillis() {
+        return timeMillis;
+    }
+
+    public void setTimeMillis(String timeMillis) {
+        this.timeMillis = timeMillis;
+    }
 }

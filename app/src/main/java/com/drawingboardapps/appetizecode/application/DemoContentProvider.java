@@ -1,7 +1,7 @@
 package com.drawingboardapps.appetizecode.application;
 
-import com.drawingboardapps.transactionsdk.TransactionEngine;
 import com.drawingboardapps.transactionsdk.TransactionRequest;
+import com.drawingboardapps.transactionsdk.TransactionSDK;
 
 import java.util.ArrayList;
 
@@ -13,34 +13,38 @@ import java.util.ArrayList;
 class DemoContentProvider {
 
     static DemoContentProvider instance;
-    TransactionEngine engine;
+    TransactionSDK engine;
 
     private DemoContentProvider(){
-        engine = new TransactionEngine();
+        engine = new TransactionSDK();
     }
 
-    public static DemoContentProvider init(){
-        if (instance != null){
-            return instance;
-        }else{
-            instance = new DemoContentProvider();
-            return instance;
-        }
-    }
-    static class TransactionDriver{
+    public static void init() {
 
-        public static void startTransaction(){
-            engine.startTransaction();
-        }
     }
 
-    static class RealmDriver{
-        public static void saveTransactionOffline(TransactionRequest request){
-            return;
-        }
-
-        public ArrayList<TransactionRequest> retrieveOfflineTransactionRequests(){
-            return null;
-        }
-    }
+//    public static DemoContentProvider init(){
+//        if (instance != null){
+//            return instance;
+//        }else{
+//            instance = new DemoContentProvider();
+//            return instance;
+//        }
+//    }
+//    static class TransactionDriver{
+//
+//        public static void startTransaction(){
+//            engine.startTransaction();
+//        }
+//    }
+//
+//    static class RealmDriver{
+//        public static void saveTransactionOffline(TransactionRequest request){
+//            return;
+//        }
+//
+//        public ArrayList<TransactionRequest> retrieveOfflineTransactionRequests(){
+//            return null;
+//        }
+//    }
 }

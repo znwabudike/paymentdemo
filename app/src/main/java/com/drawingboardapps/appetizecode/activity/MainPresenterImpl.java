@@ -1,45 +1,125 @@
 package com.drawingboardapps.appetizecode.activity;
 
+import android.support.annotation.NonNull;
+import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
 import com.drawingboardapps.appetizecode.viewmodel.VMButtonBar;
 import com.drawingboardapps.appetizecode.viewmodel.VMKeyboard;
 import com.drawingboardapps.appetizecode.viewmodel.VMPriceInput;
-import com.drawingboardapps.transactionsdk.TransactionInterface;
+import com.drawingboardapps.transactionsdk.Transaction;
+import com.drawingboardapps.transactionsdk.TransactionRequest;
+import com.drawingboardapps.transactionsdk.TransactionResult;
 
 /**
+ *
+ * MainPresenterImpl - Basically acts as a buffer to the Activity or Fragment that hosts it.
+ *
  * Created by Zach on 4/23/2017.
  */
-
 public class MainPresenterImpl implements MainPresenter {
 
-    private final TransactionInterface transactionInterface;
-    private VMPriceInput priceVM;
-    private VMKeyboard keyboard;
-    private VMButtonBar buttonBar;
+    private final PresenterDelegates delegate;
 
-    public MainPresenterImpl(TransactionInterface transactionInterface) {
-        this.transactionInterface = transactionInterface;
+
+    public MainPresenterImpl(@NonNull PresenterDelegates delegate){
+        this.delegate = delegate;
     }
 
-    public void initViews(){
-        initButtonBar();
-        initKeyboard(initPriceBar());
+    /**
+     * Given a {@link ActivityDemoBinding} bind a {@link VMKeyboard}, {@link VMPriceInput},
+     * and {@link VMButtonBar}
+     *
+     * @param binding parent binding to which the elements should be bound
+     */
+    public void initViews(@NonNull ActivityDemoBinding binding){
+        VMButtonBar buttonBar = initButtonBar(binding);
+        binding.setButtonBarModel(buttonBar);
+
+        VMPriceInput priceBar = initPriceBar(binding);
+        binding.setPriceModel(priceBar);
+
+        VMKeyboard keyboard = initKeyboard(priceBar, binding);
+        binding.setKeyboardModel(keyboard);
     }
 
-    private VMPriceInput initPriceBar() {
-        priceVM = new VMPriceInput(this);
-        return priceVM;
+    /**
+     * Set price bar binding
+     * @param binding
+     * @return the ViewModel for price input
+     */
+    private VMPriceInput initPriceBar(@NonNull ActivityDemoBinding binding) {
+        return new VMPriceInput(this);
     }
 
-    private void initKeyboard(KeyboardInterface priceVM) {
-        keyboard = new VMKeyboard(priceVM);
+    /**
+     * Set keyboard binding
+     * @param priceVM
+     * @param binding binding for the activity in which it is hosted.
+     */
+    private VMKeyboard initKeyboard(@NonNull KeyboardInterface priceVM, @NonNull ActivityDemoBinding binding) {
+        return new VMKeyboard(priceVM);
     }
 
-    private void initButtonBar() {
-        buttonBar = new VMButtonBar(this);
+    /**
+     * Set button bar binding
+     * @param binding binding for the activity in which it is hosted.
+     */
+    private VMButtonBar initButtonBar(@NonNull ActivityDemoBinding binding) {
+       return new VMButtonBar(this);
+    }
+
+    /**
+     * Show the transaction results when they are received.
+     * @param transactionResult model to display.
+     */
+    private void displayTransactionResults(@NonNull TransactionResult transactionResult) {
+        showTransactionCompleteDialog(transactionResult);
+    }
+
+    /**
+     * Show a dialog informing the user that the transaction is complete
+     * @param transactionResult model to display.
+     */
+    public void showTransactionCompleteDialog(@NonNull TransactionResult transactionResult) {
+        //TODO create a Fragment and bind the transactionResult to it and reset the transaction
+        //TODO when dismissed and get ready for a new transaction.
+    }
+
+    /**
+     * Show a dialog that the user has encountered an error.
+     * @param e
+     */
+    private void displayError(@NonNull Throwable e) {
+        //TODO display an error dialog
+    }
+
+    private Transaction transaction = new Transaction();
+
+    /**
+     * Reset the current transaction
+     */
+    public void doCancelTransaction(){
+        transaction = new Transaction();
+    }
+
+
+    @Override
+    public void onError(@NonNull Throwable e) {
+        displayError(e);
     }
 
     @Override
-    public void submitClicked(String text) {
-        String total = priceVM.getText();
+    public void onTransactionComplete(@NonNull TransactionResult transactionResult) {
+        displayTransactionResults(transactionResult);
     }
+
+    @Override
+    public void submitClicked(@NonNull String text) {
+        if (!text.replace("$","").equals(transaction.getSubtotal().toString())) {
+            transaction.setSubtotal(text);
+        }
+
+        TransactionRequest request = transaction.buildRequest();
+        delegate.doStartTransaction(request);
+    }
+
 }
