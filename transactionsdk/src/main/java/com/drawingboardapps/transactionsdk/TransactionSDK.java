@@ -7,7 +7,14 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
+import java.util.HashMap;
+
+import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -29,6 +36,9 @@ public final class TransactionSDK {
     private TransactionHelper transactionHelper;
     private boolean serviceBound;
 
+    private HashMap<TransactionRequest, Observable> subscribers = new HashMap<>();
+    private HashMap<TransactionRequest, Scheduler> threads = new HashMap<>();
+
     public TransactionSDK(boolean autosave) {
         this.autosave = autosave;
         serviceHelper = new ServiceHelper();
@@ -48,6 +58,10 @@ public final class TransactionSDK {
             throw new Exception("Service not bound");
         }
         transactionHelper.startTransaction(request, callback);
+    }
+
+    public void cancelTransaction(TransactionRequest transaction) {
+        transactionHelper.cancelTransaction(transaction);
     }
 
     /**
@@ -120,6 +134,7 @@ public final class TransactionSDK {
      * Helper class to facilitate everything for the transaction API calls
      */
     final private class TransactionHelper {
+
         /**
          * Create a simple retrofit client, interceptor and security intentionally
          * left out to reduce complexity since the endpoint is not live
@@ -140,20 +155,32 @@ public final class TransactionSDK {
             Retrofit retrofit = getClient(BASE_URL);
             TransactionAPI api = retrofit.create(TransactionAPI.class);
 
-            api.startTransaction(request)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.newThread())
-                    .subscribe(getSubscriber(callback));
+            Observable<TransactionResult> observable = api.startTransaction(request);
+
+            Scheduler cancelThread = AndroidSchedulers.mainThread();
+            observable.observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread());
+
+            observable.subscribe(getSubscriber(request, callback));
+
+            threads.put(request, cancelThread);
+            subscribers.put(request, observable);
+
+        }
+
+        public void cancelTransaction(TransactionRequest transaction) {
+            subscribers.get(transaction).unsubscribeOn(threads.get(transaction));
         }
 
 
         /**
          * Get the RXJava Observer object through which the TransactionResult is received.
          *
+         * @param request
          * @param callback the callback through which results are returned to the Presentation Layer
          * @return
          */
-        private Observer<TransactionResult> getSubscriber(final TransactionCallback callback) {
+        private Observer<TransactionResult> getSubscriber(final TransactionRequest request, final TransactionCallback callback) {
             return new Observer<TransactionResult>() {
                 @Override
                 public void onSubscribe(@NonNull Disposable d) {
@@ -167,6 +194,7 @@ public final class TransactionSDK {
                         e.printStackTrace();
                     }
                     callback.onTransactionComplete(result);
+                    subscribers.remove(request);
                 }
 
                 @Override
@@ -175,9 +203,13 @@ public final class TransactionSDK {
                     //so pass a fake transaciton result
 //                e.printStackTrace();
 //                callback.onError(e);
-                    TransactionResult result = getFakeResult();
-                    if (autosave){
-                        TransactionContentProvider.saveTransactionToHistoryDatabase(result);
+                    TransactionResult result = getFakeResult(request);
+                    if (autosave) {
+                        try {
+                            TransactionContentProvider.DATABASE.saveTransactionToHistoryDatabase(result);
+                        } catch (Exception e1) {
+                            callback.onError(e);
+                        }
                     }
                     callback.onTransactionComplete(result);
                 }
@@ -193,14 +225,16 @@ public final class TransactionSDK {
          *
          * @return a fake {@link TransactionResult}
          */
-        private TransactionResult getFakeResult() {
+        private TransactionResult getFakeResult(TransactionRequest request) {
             TransactionResult result = new TransactionResult();
             result.setTimestamp(System.currentTimeMillis() + "");
-            result.setAmount("$1.00");
+            result.setAmount(request.getTotal());
             result.setTransID("ABC123");
-            result.setResponse("Approved");
-            result.setResponseCode("A");
+            long response = Math.round(Math.random());
+            result.setResponse(response == 0 ? "Approved" : "Declined");
+            result.setResponseCode(response == 0 ? "A" : "D");
             return result;
         }
+
     }
 }

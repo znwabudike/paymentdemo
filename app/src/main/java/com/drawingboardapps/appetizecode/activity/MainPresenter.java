@@ -12,5 +12,7 @@ public interface MainPresenter{
 
     void onError(Throwable e);
 
+//    void doCancelTransaction();
+
     void onTransactionComplete(TransactionResult transactionResult);
 }

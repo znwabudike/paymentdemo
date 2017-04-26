@@ -18,7 +18,7 @@ public class TransactionService extends Service {
     private String TAG = "TransactionService";
 
     public TransactionService() {
-        this.sdk = new TransactionSDK();
+        this.sdk = new TransactionSDK(true);
     }
 
     public void startTransaction(TransactionRequest request,

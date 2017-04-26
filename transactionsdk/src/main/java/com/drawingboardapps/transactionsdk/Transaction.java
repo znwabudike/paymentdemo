@@ -1,20 +1,27 @@
 package com.drawingboardapps.transactionsdk;
 
+import android.content.ClipData;
+import android.support.annotation.IntRange;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedList;
+
+import io.realm.RealmObject;
 
 /**
  * Created by zach on 4/24/17.
  */
 
-public class Transaction {
+public class Transaction implements Serializable {
 
     BigDecimal subtotal = new BigDecimal(0.0);
     BigDecimal tax = new BigDecimal(0.0);
     BigDecimal discount = new BigDecimal(0.0);
     BigDecimal total = new BigDecimal(0.0);
     LinkedList<LineItem> lineitems = new LinkedList<>();
+    private LinkedList<LineItem> lineItems;
 
     public TransactionRequest buildRequest() {
         calculateTotal();
@@ -48,8 +55,32 @@ public class Transaction {
         return subtotal;
     }
 
-    public void setSubtotal(String subtotal) {
+    public void setSubtotal(String subtotal) throws Exception {
         subtotal = subtotal.replace("$","");
+        if (subtotal == null || subtotal.length() == 0){
+            throw new Exception("Invalid Amount");
+        }
         this.subtotal = new BigDecimal(subtotal);
     }
+
+    public TransactionRealm getRealmObject(){
+        return new TransactionRealm();
+    }
+
+    public BigDecimal getTax() {
+        return tax;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public LinkedList<LineItem> getLineItems() {
+        return lineItems;
+    }
+
 }

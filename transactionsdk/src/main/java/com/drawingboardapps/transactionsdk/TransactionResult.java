@@ -12,7 +12,7 @@ import io.realm.RealmObject;
  * Created by Zach on 4/23/2017.
  */
 
-public class TransactionResult extends RealmObject {
+public class TransactionResult extends RealmObject implements Serializable {
 
     //    @SerializedName("transID")
 //    @Expose

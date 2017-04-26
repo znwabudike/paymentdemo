@@ -1,5 +1,6 @@
 package com.drawingboardapps.appetizecode.activity;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.drawingboardapps.appetizecode.R;
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
 import com.drawingboardapps.transactionsdk.BaseTransactionActivity;
+import com.drawingboardapps.transactionsdk.Transaction;
 import com.drawingboardapps.transactionsdk.TransactionRequest;
 import com.drawingboardapps.transactionsdk.TransactionCallback;
 import com.drawingboardapps.transactionsdk.TransactionResult;
@@ -55,5 +57,16 @@ public class DemoActivity extends BaseTransactionActivity implements PresenterDe
     public FragmentManager getFragManager(){
         return getSupportFragmentManager();
     }
+
+    @Override
+    public void doCancelTransaction(TransactionRequest transaction) {
+        cancelTransaction(transaction);
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
 
 }

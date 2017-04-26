@@ -31,7 +31,7 @@ public final class TransactionContentProvider {
             instance = new TransactionContentProvider();
         }
         SDK.initTransactionService(context, autosave);
-        DATABASE.initRealm();
+        DATABASE.initRealm(context);
         return instance;
     }
 
@@ -42,6 +42,7 @@ public final class TransactionContentProvider {
         instance = null;
         sdk = null;
     }
+
 
 
     /**
@@ -69,6 +70,16 @@ public final class TransactionContentProvider {
         public static void startTransaction(TransactionRequest request, TransactionCallback callback) throws Exception {
             sdk.startTransaction(request, callback);
         }
+
+
+        /**
+         * Cancel the current transaction
+         * @param transaction
+         */
+        public static void cancelTransaction(TransactionRequest transaction) {
+            sdk.cancelTransaction(transaction);
+        }
+
 
         /**
          * Call this to bind the service to a particular context
@@ -101,15 +112,19 @@ public final class TransactionContentProvider {
             if (sdk == null) return;
             sdk.unbindService(context);
         }
+
+
     }
 
-    private static class DATABASE {
+    public static class DATABASE {
         private static Realm historyRealm;
         private static Realm pendingRealm;
-        private static String TRANSACTION_HISTORY;
-        private static String TRANSACTIONS_PENDING;
+        private static String TRANSACTION_HISTORY = "history.realm";
+        private static String TRANSACTIONS_PENDING = "pending.realm";
 
-        public static void initRealm() {
+        public static void initRealm(Context context) {
+            Realm.init(context);
+
             RealmConfiguration historyConfiguration = new RealmConfiguration.Builder()
                     .name(DATABASE.TRANSACTION_HISTORY)
                     .schemaVersion(0)
@@ -143,8 +158,8 @@ public final class TransactionContentProvider {
             pendingRealm = Realm.getInstance(pendingConfiguration);
         }
 
-        public static void saveTransactionToHistoryDatabase(TransactionResult result) {
-            if (historyRealm == null) initRealm();
+        public static void saveTransactionToHistoryDatabase(TransactionResult result) throws Exception {
+            if (historyRealm == null) throw new Exception("Realm not initialized");
             historyRealm.beginTransaction();
             historyRealm.copyToRealm(result);
             historyRealm.commitTransaction();

@@ -2,8 +2,10 @@ package com.drawingboardapps.appetizecode.activity;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.widget.Toast;
 
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
+import com.drawingboardapps.appetizecode.fragments.BaseDialogFragment;
 import com.drawingboardapps.appetizecode.fragments.TransactionDialogFragment;
 import com.drawingboardapps.appetizecode.viewmodel.VMButtonBar;
 import com.drawingboardapps.appetizecode.viewmodel.VMKeyboard;
@@ -21,6 +23,8 @@ import com.drawingboardapps.transactionsdk.TransactionResult;
 public class MainPresenterImpl implements MainPresenter {
 
     private final PresenterDelegates delegate;
+    private TransactionRequest request;
+    private TransactionDialogFragment waitFragment;
 
 
     MainPresenterImpl(@NonNull PresenterDelegates delegate){
@@ -87,7 +91,8 @@ public class MainPresenterImpl implements MainPresenter {
     }
 
     private DialogFragment getTransactionDialog(TransactionResult transactionResult){
-        return TransactionDialogFragment.newInstance(transactionResult);
+        //TODO implement retry callback
+        return TransactionDialogFragment.newInstance(transactionResult, null);
     }
 
     /**
@@ -95,17 +100,22 @@ public class MainPresenterImpl implements MainPresenter {
      * @param e
      */
     private void displayError(@NonNull Throwable e) {
-        //TODO display an error dialog
+        Toast.makeText(delegate.getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        //TODO pass callback with options if any
+        new BaseDialogFragment().getErrorDialog(e.getMessage(), delegate.getContext()).show();
     }
 
     private Transaction transaction = new Transaction();
 
-    /**
-     * Reset the current transaction
-     */
-    public void doCancelTransaction(){
-        transaction = new Transaction();
-    }
+//    /**
+//     * Reset the current transaction
+//     */
+//    @Override
+//    public void doCancelTransaction(){
+//        delegate.doCancelTransaction(request);
+//        transaction = new Transaction();
+//        request = null;
+//    }
 
 
     @Override
@@ -115,17 +125,45 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onTransactionComplete(@NonNull TransactionResult transactionResult) {
+        if (waitFragment != null) {
+            waitFragment.dismiss();
+            waitFragment = null;
+        }
         displayTransactionResults(transactionResult);
     }
 
     @Override
     public void submitClicked(@NonNull String text) {
         if (!text.replace("$","").equals(transaction.getSubtotal().toString())) {
-            transaction.setSubtotal(text);
+            try {
+                transaction.setSubtotal(text);
+            } catch (Exception e) {
+                new BaseDialogFragment().getErrorDialog(e.getMessage(), delegate.getContext()).show();
+                return;
+            }
         }
-
         TransactionRequest request = transaction.buildRequest();
+        //show waiting dialog
+        waitFragment = TransactionDialogFragment.newInstance(request,
+                getCancelTransactionDelegate(request));
+        waitFragment.show(delegate.getFragManager(),"waiting");
+        //send the request
         delegate.doStartTransaction(request);
+    }
+
+
+    private TransactionDialogFragment.DialogCallback getCancelTransactionDelegate(final TransactionRequest request) {
+        return new TransactionDialogFragment.DialogCallback() {
+            @Override
+            public void cancelTransaction() {
+                cancelTransacitonRequest(request);
+            }
+        };
+    }
+
+    private void cancelTransacitonRequest(TransactionRequest request){
+        transaction = new Transaction();
+        delegate.doCancelTransaction(request);
     }
 
 }

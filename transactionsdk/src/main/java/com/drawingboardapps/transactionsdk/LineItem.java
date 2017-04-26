@@ -1,10 +1,13 @@
 package com.drawingboardapps.transactionsdk;
 
+import io.realm.Realm;
+import io.realm.RealmObject;
+
 /**
  * Created by zach on 4/24/17.
  */
 
-class LineItem {
+public class LineItem extends RealmObject{
 
     String id;
     String price;

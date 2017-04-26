@@ -16,7 +16,7 @@ public class BaseTransactionActivity extends AppCompatActivity {
     private String TAG = "BaseTransactionActivity";
 
     public BaseTransactionActivity() {
-        transactionSDK = new TransactionSDK();
+        transactionSDK = new TransactionSDK(true);
     }
 
     @Override
@@ -55,6 +55,10 @@ public class BaseTransactionActivity extends AppCompatActivity {
             }
             callback.onError(e);
         }
+    }
+
+    public void cancelTransaction(TransactionRequest transaction) {
+        TransactionContentProvider.SDK.cancelTransaction(transaction);
     }
 
 }
