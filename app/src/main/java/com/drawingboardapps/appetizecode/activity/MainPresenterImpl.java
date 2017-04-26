@@ -23,7 +23,7 @@ public class MainPresenterImpl implements MainPresenter {
     private final PresenterDelegates delegate;
 
 
-    public MainPresenterImpl(@NonNull PresenterDelegates delegate){
+    MainPresenterImpl(@NonNull PresenterDelegates delegate){
         this.delegate = delegate;
     }
 
@@ -33,7 +33,7 @@ public class MainPresenterImpl implements MainPresenter {
      *
      * @param binding parent binding to which the elements should be bound
      */
-    public void initViews(@NonNull ActivityDemoBinding binding){
+    void initViews(@NonNull ActivityDemoBinding binding){
         VMButtonBar buttonBar = initButtonBar(binding);
         binding.setButtonBarModel(buttonBar);
 
@@ -82,11 +82,11 @@ public class MainPresenterImpl implements MainPresenter {
      * Show a dialog informing the user that the transaction is complete
      * @param transactionResult model to display.
      */
-    public void showTransactionCompleteDialog(@NonNull TransactionResult transactionResult) {
+    private void showTransactionCompleteDialog(@NonNull TransactionResult transactionResult) {
         getTransactionDialog(transactionResult).show(delegate.getFragManager(), "resultDialog");
     }
 
-    DialogFragment getTransactionDialog(TransactionResult transactionResult){
+    private DialogFragment getTransactionDialog(TransactionResult transactionResult){
         return TransactionDialogFragment.newInstance(transactionResult);
     }
 

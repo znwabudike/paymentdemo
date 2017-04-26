@@ -26,11 +26,11 @@ public final class TransactionContentProvider {
      * @param context
      * @return
      */
-    public static TransactionContentProvider init(Context context) {
+    public static TransactionContentProvider init(Context context, boolean autosave) {
         if (instance == null) {
             instance = new TransactionContentProvider();
         }
-        SDK.initTransactionService(context);
+        SDK.initTransactionService(context, autosave);
         DATABASE.initRealm();
         return instance;
     }
@@ -43,6 +43,7 @@ public final class TransactionContentProvider {
         sdk = null;
     }
 
+
     /**
      * SDK Class to communicate with the {@link TransactionSDK}
      */
@@ -53,8 +54,8 @@ public final class TransactionContentProvider {
          *
          * @param context
          */
-        public static void initTransactionService(Context context) {
-            sdk = new TransactionSDK();
+        public static void initTransactionService(Context context, boolean autosave) {
+            sdk = new TransactionSDK(autosave);
             sdk.startService(context);
         }
 
@@ -140,6 +141,13 @@ public final class TransactionContentProvider {
                     ).build();
 
             pendingRealm = Realm.getInstance(pendingConfiguration);
+        }
+
+        public static void saveTransactionToHistoryDatabase(TransactionResult result) {
+            if (historyRealm == null) initRealm();
+            historyRealm.beginTransaction();
+            historyRealm.copyToRealm(result);
+            historyRealm.commitTransaction();
         }
     }
 }

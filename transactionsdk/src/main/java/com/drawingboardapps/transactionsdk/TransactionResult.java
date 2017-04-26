@@ -5,36 +5,35 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+import io.realm.RealmObject;
+
 /**
- *
  * Transaction result POJO
- *
- * //TODO make this a RealmObject
- *
  * Created by Zach on 4/23/2017.
  */
 
-public class TransactionResult implements Serializable {
+public class TransactionResult extends RealmObject {
 
-    @SerializedName("transID")
-    @Expose
-    String transID = "";
-    @SerializedName("timestamp")
-    @Expose
-    String timestamp = "";
-    @SerializedName("amount")
-    @Expose
-    String amount = "";
-    @SerializedName("response")
-    @Expose
-    String response = "";
-    @SerializedName("responseCode")
-    @Expose
-    String responseCode = "";
+    //    @SerializedName("transID")
+//    @Expose
+    private String transID = "";
+    //    @SerializedName("timestamp")
+//    @Expose
+    private String timestamp = "";
+    //    @SerializedName("amount")
+//    @Expose
+    private String amount = "";
+    //    @SerializedName("response")
+//    @Expose
+    private String response = "";
+    //    @SerializedName("responseCode")
+//    @Expose
+    private String responseCode = "";
 
 
     /**
      * Get the timestamp of this transaction
+     *
      * @return time in millis
      */
     public String getTimestamp() {
@@ -43,6 +42,7 @@ public class TransactionResult implements Serializable {
 
     /**
      * Get verbose response
+     *
      * @return ex. Approved, Declined, Error
      */
     public String getResponse() {
@@ -51,6 +51,7 @@ public class TransactionResult implements Serializable {
 
     /**
      * Get the response code
+     *
      * @return responseCode - A = approved, D = declined, E = error
      */
     public String getResponseCode() {
@@ -59,6 +60,7 @@ public class TransactionResult implements Serializable {
 
     /**
      * Get the amouint of this transaction
+     *
      * @return
      */
     public String getAmount() {
@@ -67,6 +69,7 @@ public class TransactionResult implements Serializable {
 
     /**
      * Get the transaction ID of the transaction
+     *
      * @return
      */
     public String getTransID() {
@@ -80,6 +83,7 @@ public class TransactionResult implements Serializable {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+
     public void setAmount(String amount) {
         this.amount = amount;
     }

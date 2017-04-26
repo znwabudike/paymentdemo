@@ -11,11 +11,12 @@ import com.drawingboardapps.transactionsdk.BaseTransactionActivity;
 import com.drawingboardapps.transactionsdk.TransactionRequest;
 import com.drawingboardapps.transactionsdk.TransactionCallback;
 import com.drawingboardapps.transactionsdk.TransactionResult;
+import com.drawingboardapps.transactionsdk.TransactionService;
 
 /**
  * Activity to demonstrate a simple Transaction SDK, extends {@link com.drawingboardapps.transactionsdk.BaseTransactionActivity}
  * which handles
- * the {@link com.drawingboardapps.appetizecode.service.TransactionService}
+ * the {@link TransactionService}
  * <p>
  * MVVM pattern used with a Presenter
  * <p>

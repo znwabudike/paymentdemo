@@ -25,10 +25,12 @@ public final class TransactionSDK {
     private final String BASE_URL = "http://www.inchestilzachandjoreunite.com/";
     private final String TAG = "TransactionSDK";
     private final ServiceHelper serviceHelper;
+    private final boolean autosave;
     private TransactionHelper transactionHelper;
     private boolean serviceBound;
 
-    public TransactionSDK() {
+    public TransactionSDK(boolean autosave) {
+        this.autosave = autosave;
         serviceHelper = new ServiceHelper();
         transactionHelper = new TransactionHelper();
     }
@@ -173,7 +175,11 @@ public final class TransactionSDK {
                     //so pass a fake transaciton result
 //                e.printStackTrace();
 //                callback.onError(e);
-                    callback.onTransactionComplete(getFakeResult());
+                    TransactionResult result = getFakeResult();
+                    if (autosave){
+                        TransactionContentProvider.saveTransactionToHistoryDatabase(result);
+                    }
+                    callback.onTransactionComplete(result);
                 }
 
                 @Override

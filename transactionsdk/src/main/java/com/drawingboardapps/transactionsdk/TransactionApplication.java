@@ -1,4 +1,4 @@
-package com.drawingboardapps.appetizecode.application;
+package com.drawingboardapps.transactionsdk;
 
 import android.app.Application;
 
@@ -14,20 +14,16 @@ import com.squareup.leakcanary.LeakCanary;
 
 public class TransactionApplication extends Application {
 
-    final public boolean leakCanaryEnabled = true;
+
+    private final boolean autoSaveTransactions;
+
+    public TransactionApplication(boolean autoSaveTransactions){
+        this.autoSaveTransactions = autoSaveTransactions;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        TransactionContentProvider.init(this);
-
-        if (leakCanaryEnabled) {
-            if (LeakCanary.isInAnalyzerProcess(this)) {
-                // This process is dedicated to LeakCanary for heap analysis.
-                // You should not init your app in this process.
-                return;
-            }
-            LeakCanary.install(this);
-        }
+        TransactionContentProvider.init(this, autoSaveTransactions);
     }
 }
