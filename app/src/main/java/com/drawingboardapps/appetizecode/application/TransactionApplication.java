@@ -2,7 +2,7 @@ package com.drawingboardapps.appetizecode.application;
 
 import android.app.Application;
 
-import com.drawingboardapps.transactionsdk.DemoContentProvider;
+import com.drawingboardapps.transactionsdk.TransactionContentProvider;
 import com.drawingboardapps.transactionsdk.TransactionSDK;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -12,14 +12,14 @@ import com.squareup.leakcanary.LeakCanary;
  * Created by Zach on 4/23/2017.
  */
 
-public class DemoApplication extends Application {
+public class TransactionApplication extends Application {
 
     final public boolean leakCanaryEnabled = true;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        DemoContentProvider.init(this);
+        TransactionContentProvider.init(this);
 
         if (leakCanaryEnabled) {
             if (LeakCanary.isInAnalyzerProcess(this)) {

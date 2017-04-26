@@ -2,18 +2,18 @@ package com.drawingboardapps.appetizecode.activity;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.drawingboardapps.appetizecode.R;
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
+import com.drawingboardapps.transactionsdk.BaseTransactionActivity;
 import com.drawingboardapps.transactionsdk.TransactionRequest;
 import com.drawingboardapps.transactionsdk.TransactionCallback;
 import com.drawingboardapps.transactionsdk.TransactionResult;
 
 /**
- * Activity to demonstrate a simple Transaction SDK, extends {@link BaseTransactionActivity}
+ * Activity to demonstrate a simple Transaction SDK, extends {@link com.drawingboardapps.transactionsdk.BaseTransactionActivity}
  * which handles
  * the {@link com.drawingboardapps.appetizecode.service.TransactionService}
  * <p>
