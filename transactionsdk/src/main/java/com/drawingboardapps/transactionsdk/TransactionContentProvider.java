@@ -1,30 +1,26 @@
-package com.drawingboardapps.appetizecode.application;
+package com.drawingboardapps.transactionsdk;
 import android.content.Context;
-import com.drawingboardapps.transactionsdk.TransactionCallback;
-import com.drawingboardapps.transactionsdk.TransactionRequest;
-import com.drawingboardapps.transactionsdk.TransactionSDK;
-import com.drawingboardapps.transactionsdk.TransactionService;
 
 /**
  * Warning, call destroy() on this class
  * Created by Zach on 4/23/2017.
  */
 
-public final class DemoContentProvider {
+public final class TrasnsactionContentProvider {
 
     private static TransactionSDK sdk;
-    static DemoContentProvider instance;
+    static TrasnsactionContentProvider instance;
 
-    private DemoContentProvider(){}
+    private TrasnsactionContentProvider(){}
 
     /**
      * Initialize the content provider
      * @param context
      * @return
      */
-    static DemoContentProvider init(Context context) {
+    public static TrasnsactionContentProvider init(Context context) {
         if (instance == null){
-            instance = new DemoContentProvider();
+            instance = new TrasnsactionContentProvider();
         }
         SDK.initTransactionService(context);
         return instance;
@@ -92,11 +88,11 @@ public final class DemoContentProvider {
         }
     }
 
-//    public static DemoContentProvider init(){
+//    public static TrasnsactionContentProvider init(){
 //        if (instance != null){
 //            return instance;
 //        }else{
-//            instance = new DemoContentProvider();
+//            instance = new TrasnsactionContentProvider();
 //            return instance;
 //        }
 //    }

@@ -2,13 +2,13 @@ package com.drawingboardapps.appetizecode.application;
 
 import android.app.Application;
 
-import com.drawingboardapps.appetizecode.service.TransactionService;
+import com.drawingboardapps.transactionsdk.DemoContentProvider;
 import com.drawingboardapps.transactionsdk.TransactionSDK;
 import com.squareup.leakcanary.LeakCanary;
 
 
 /**
- * Application base  which gives access to {@link TransactionSDK} and {@link TransactionService}
+ * Application base  which gives access to {@link TransactionSDK} and {@link com.drawingboardapps.transactionsdk.TransactionService}
  * Created by Zach on 4/23/2017.
  */
 
@@ -30,7 +30,4 @@ public class DemoApplication extends Application {
             LeakCanary.install(this);
         }
     }
-
-
-
 }
