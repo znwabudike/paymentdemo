@@ -9,13 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.drawingboardapps.appetizecode.BuildConfig;
+import com.drawingboardapps.appetizecode.application.DemoApplication;
+import com.drawingboardapps.appetizecode.application.DemoContentProvider;
 import com.drawingboardapps.appetizecode.service.TransactionService;
 import com.drawingboardapps.transactionsdk.TransactionCallback;
 import com.drawingboardapps.transactionsdk.TransactionRequest;
 import com.drawingboardapps.transactionsdk.TransactionSDK;
 
 /**
- * BaseActivity which gives access to {@link TransactionSDK} and {@link TransactionService}
+ * BaseActivity
  *
  * Created by Zach on 4/23/2017.
  */
@@ -44,31 +46,24 @@ class BaseTransactionActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        startTransactionService();
+        DemoContentProvider.SDK.bindService(this);
     }
 
     @Override
     protected void onStop() {
-        stopTransactionService();
+        DemoContentProvider.SDK.unbindService(this);
         super.onStop();
     }
 
-    ///////  Transaction Service  /////////
-    private void stopTransactionService() {
-        unbindService(serviceConnection);
-    }
-
-    private void startTransactionService() {
-        Intent serviceIntent = new Intent(this, TransactionService.class);
-        startService(serviceIntent);
-        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
+    /**
+     * Call on {@link DemoContentProvider} to start the transaction and delegate error if any.
+     * @param request transaction request
+     * @param callback callback to
+     */
     protected void startTransaction(TransactionRequest request, TransactionCallback callback) {
         try {
-            if (!serviceBound) throw new Exception("Service not bound");
-            boundService.startTransaction(request, callback);
-        } catch (Exception e) {
+            DemoContentProvider.SDK.startTransaction(request, callback);
+        } catch (Exception e) { //service not bound
             if (BuildConfig.DEBUG) {
                 e.printStackTrace();
             }
@@ -76,20 +71,4 @@ class BaseTransactionActivity extends AppCompatActivity {
         }
     }
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected: ");
-            serviceBound = false;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected: ");
-            TransactionService.BinderImpl myBinder = (TransactionService.BinderImpl) service;
-            boundService = myBinder.getService();
-            serviceBound = true;
-        }
-    };
 }

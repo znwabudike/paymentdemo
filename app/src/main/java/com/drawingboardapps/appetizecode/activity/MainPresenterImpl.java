@@ -1,7 +1,10 @@
 package com.drawingboardapps.appetizecode.activity;
 
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
+import com.drawingboardapps.appetizecode.fragments.TransactionDialogFragment;
 import com.drawingboardapps.appetizecode.viewmodel.VMButtonBar;
 import com.drawingboardapps.appetizecode.viewmodel.VMKeyboard;
 import com.drawingboardapps.appetizecode.viewmodel.VMPriceInput;
@@ -80,8 +83,11 @@ public class MainPresenterImpl implements MainPresenter {
      * @param transactionResult model to display.
      */
     public void showTransactionCompleteDialog(@NonNull TransactionResult transactionResult) {
-        //TODO create a Fragment and bind the transactionResult to it and reset the transaction
-        //TODO when dismissed and get ready for a new transaction.
+        getTransactionDialog(transactionResult).show(delegate.getFragManager(), "resultDialog");
+    }
+
+    DialogFragment getTransactionDialog(TransactionResult transactionResult){
+        return TransactionDialogFragment.newInstance(transactionResult);
     }
 
     /**

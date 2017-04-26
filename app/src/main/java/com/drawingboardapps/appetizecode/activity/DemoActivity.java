@@ -2,7 +2,10 @@ package com.drawingboardapps.appetizecode.activity;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
+
 import com.drawingboardapps.appetizecode.R;
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
 import com.drawingboardapps.transactionsdk.TransactionRequest;
@@ -13,12 +16,12 @@ import com.drawingboardapps.transactionsdk.TransactionResult;
  * Activity to demonstrate a simple Transaction SDK, extends {@link BaseTransactionActivity}
  * which handles
  * the {@link com.drawingboardapps.appetizecode.service.TransactionService}
- *
+ * <p>
  * MVVM pattern used with a Presenter
- *
+ * <p>
  * Written by Zach Nwabudike 4/24/2017
  */
-public class DemoActivity extends BaseTransactionActivity implements PresenterDelegates{
+public class DemoActivity extends BaseTransactionActivity implements PresenterDelegates {
 
     private MainPresenterImpl presenter;
     private String TAG = "DemoActivity";
@@ -33,24 +36,23 @@ public class DemoActivity extends BaseTransactionActivity implements PresenterDe
 
     @Override
     public void doStartTransaction(TransactionRequest transactionRequest) {
-        try {
-            startTransaction(transactionRequest, new TransactionCallback() {
+        startTransaction(transactionRequest, new TransactionCallback() {
+            @Override
+            public void onTransactionComplete(TransactionResult transactionResult) {
+                presenter.onTransactionComplete(transactionResult);
+            }
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "onError: " + e.getMessage());
+                e.printStackTrace();
+                presenter.onError(e);
+            }
+        });
+    }
 
-                @Override
-                public void onTransactionComplete(TransactionResult transactionResult) {
-                    presenter.onTransactionComplete(transactionResult);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError: " + e.getMessage());
-                    e.printStackTrace();
-                    presenter.onError(e);
-                }
-            });
-        } catch (Exception e) {
-            presenter.onError(e);
-        }
+    @Override
+    public FragmentManager getFragManager(){
+        return getSupportFragmentManager();
     }
 
 }

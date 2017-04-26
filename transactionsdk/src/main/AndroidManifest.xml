@@ -7,6 +7,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
 
+        <service android:name="com.drawingboardapps.transactionsdk.TransactionService">
+        </service>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>

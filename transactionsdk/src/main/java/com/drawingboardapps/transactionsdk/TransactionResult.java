@@ -3,6 +3,8 @@ package com.drawingboardapps.transactionsdk;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  *
  * Transaction result POJO
@@ -12,7 +14,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Zach on 4/23/2017.
  */
 
-public class TransactionResult {
+public class TransactionResult implements Serializable {
 
     @SerializedName("transID")
     @Expose

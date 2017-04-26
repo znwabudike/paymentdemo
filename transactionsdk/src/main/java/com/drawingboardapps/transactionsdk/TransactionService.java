@@ -1,14 +1,10 @@
-package com.drawingboardapps.appetizecode.service;
+package com.drawingboardapps.transactionsdk;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
-
-import com.drawingboardapps.transactionsdk.TransactionCallback;
-import com.drawingboardapps.transactionsdk.TransactionRequest;
-import com.drawingboardapps.transactionsdk.TransactionSDK;
 
 /**
  * Service using RXAndroid to perform calls to API, return exception is caught and a

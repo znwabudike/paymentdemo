@@ -4,9 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AppetizeCode.iml" filepath="$PROJECT_DIR$/AppetizeCode.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/paymentdemo.iml" filepath="$PROJECT_DIR$/paymentdemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/transactionsdk/transactionsdk.iml" filepath="$PROJECT_DIR$/transactionsdk/transactionsdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/transactionsdk/transactionsdk.iml" filepath="$PROJECT_DIR$/transactionsdk/transactionsdk.iml" />
     </modules>
   </component>

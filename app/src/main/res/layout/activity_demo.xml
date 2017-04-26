@@ -9,11 +9,12 @@
             name="priceModel"
             type="com.drawingboardapps.appetizecode.viewmodel.VMPriceInput"/>
         <variable
-            name="keyboardModel"
-            type="com.drawingboardapps.appetizecode.viewmodel.VMKeyboard"/>
-        <variable
             name="buttonBarModel"
             type="com.drawingboardapps.appetizecode.viewmodel.VMButtonBar"/>
+        <variable
+            name="keyboardModel"
+            type="com.drawingboardapps.appetizecode.viewmodel.VMKeyboard"/>
+
     </data>
 
     <RelativeLayout
@@ -30,7 +31,7 @@
 
         <include
             android:id="@+id/select_item_bar"
-            layout="@layout/chooser_bar"
+            layout="@layout/button_bar"
             bind:buttonBarModel="@{buttonBarModel}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
