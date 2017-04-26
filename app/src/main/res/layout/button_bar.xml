@@ -4,7 +4,7 @@
     <data>
 
         <variable
-            name="barModel"
+            name="buttonBarModel"
             type="com.drawingboardapps.appetizecode.viewmodel.VMButtonBar" />
     </data>
 
