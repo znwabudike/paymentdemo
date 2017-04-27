@@ -46,10 +46,12 @@ public class DemoActivity extends BaseTransactionActivity implements PresenterDe
             }
             @Override
             public void onError(Throwable e) {
-                Log.d(TAG, "onError: " + e.getMessage());
-                e.printStackTrace();
+//                Log.d(TAG, "onError: " + e.getMessage());
+//                e.printStackTrace();
+                Log.d(TAG, "onError: Error2");
                 presenter.onError(e);
             }
+
         });
     }
 

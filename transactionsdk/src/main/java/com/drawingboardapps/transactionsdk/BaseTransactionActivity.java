@@ -1,6 +1,7 @@
 package com.drawingboardapps.transactionsdk;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 /**
  * BaseActivity
@@ -53,6 +54,7 @@ public class BaseTransactionActivity extends AppCompatActivity {
             if (BuildConfig.DEBUG) {
                 e.printStackTrace();
             }
+            Log.d(TAG, "startTransaction: - Service not bound - Error1");
             callback.onError(e);
         }
     }

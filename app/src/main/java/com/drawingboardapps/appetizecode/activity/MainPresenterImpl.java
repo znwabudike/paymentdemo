@@ -2,6 +2,7 @@ package com.drawingboardapps.appetizecode.activity;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
@@ -27,7 +28,7 @@ public class MainPresenterImpl implements MainPresenter {
     private TransactionDialogFragment waitFragment;
 
 
-    MainPresenterImpl(@NonNull PresenterDelegates delegate){
+    public MainPresenterImpl(@NonNull PresenterDelegates delegate){
         this.delegate = delegate;
     }
 
@@ -117,9 +118,11 @@ public class MainPresenterImpl implements MainPresenter {
 //        request = null;
 //    }
 
+    final private String TAG = "MainPresebterImpl";
 
     @Override
     public void onError(@NonNull Throwable e) {
+        Log.d(TAG, "onError: Error3");
         displayError(e);
     }
 
@@ -166,4 +169,7 @@ public class MainPresenterImpl implements MainPresenter {
         delegate.doCancelTransaction(request);
     }
 
+    public void onTransactionCancelled() {
+        //TODO display cancel success
+    }
 }

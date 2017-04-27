@@ -7,37 +7,18 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.util.HashMap;
-
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 /**
  * SDK Class to perform a transaction.
  * <p>
  * Created by Zach on 4/23/2017.
  */
 public final class TransactionSDK {
-    private final String BASE_URL = "http://www.inchestilzachandjoreunite.com/";
+
     private final String TAG = "TransactionSDK";
     private final ServiceHelper serviceHelper;
     private final boolean autosave;
-    private TransactionHelper transactionHelper;
     private boolean serviceBound;
-
-    private HashMap<TransactionRequest, Observable> subscribers = new HashMap<>();
-    private HashMap<TransactionRequest, Scheduler> threads = new HashMap<>();
+    private TransactionHelper transactionHelper;
 
     public TransactionSDK(boolean autosave) {
         this.autosave = autosave;
@@ -51,17 +32,15 @@ public final class TransactionSDK {
      *
      * @param request  the request to process
      * @param callback the callback through which results are returned to the Presentation Layer
+     * @throws Exception if the service is not bound
      */
     public void startTransaction(TransactionRequest request,
                                  final TransactionCallback callback) throws Exception {
-        if (!serviceBound) {
-            throw new Exception("Service not bound");
-        }
-        transactionHelper.startTransaction(request, callback);
+        serviceHelper.startTransaction(request, callback);
     }
 
     public void cancelTransaction(TransactionRequest transaction) {
-        transactionHelper.cancelTransaction(transaction);
+        serviceHelper.cancelTransaction(transaction);
     }
 
     /**
@@ -78,11 +57,15 @@ public final class TransactionSDK {
     }
 
     public void unbindService(Context context) {
-        serviceHelper.unbindService(context);
+        serviceHelper.unbindService();
     }
 
     public boolean bindService(Context context) {
         return serviceHelper.bindService(context);
+    }
+
+    boolean isServiceBount() {
+        return serviceHelper.isServiceBound();
     }
 
 
@@ -110,6 +93,11 @@ public final class TransactionSDK {
             }
         };
 
+        private void startTransaction(TransactionRequest transaction, TransactionCallback callback) throws Exception {
+            if (! serviceBound) throw new Exception("Service not bound");
+            boundService.startTransaction(transaction, callback, autosave);
+        }
+
         private void startService(Context context) {
             context.startService(new Intent(context, TransactionService.class));
         }
@@ -124,117 +112,18 @@ public final class TransactionSDK {
                     Context.BIND_AUTO_CREATE);
         }
 
-        private void unbindService(Context context) {
-            context.unbindService(serviceConnection);
+        private void unbindService() {
+            if (serviceBound)
+            boundService.unbindService(serviceConnection);
         }
 
-    }
-
-    /**
-     * Helper class to facilitate everything for the transaction API calls
-     */
-    final private class TransactionHelper {
-
-        /**
-         * Create a simple retrofit client, interceptor and security intentionally
-         * left out to reduce complexity since the endpoint is not live
-         *
-         * @param baseUrl URL to perform REST request
-         * @return a Retrofit instance
-         */
-        private Retrofit getClient(String baseUrl) {
-            Log.d(TAG, "getClient: ");
-            return new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
-        }
-
-        private void startTransaction(TransactionRequest request, TransactionCallback callback) {
-            Retrofit retrofit = getClient(BASE_URL);
-            TransactionAPI api = retrofit.create(TransactionAPI.class);
-
-            Observable<TransactionResult> observable = api.startTransaction(request);
-
-            Scheduler cancelThread = AndroidSchedulers.mainThread();
-            observable.observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.newThread());
-
-            observable.subscribe(getSubscriber(request, callback));
-
-            threads.put(request, cancelThread);
-            subscribers.put(request, observable);
-
+        private boolean isServiceBound() {
+            return serviceBound;
         }
 
         public void cancelTransaction(TransactionRequest transaction) {
-            subscribers.get(transaction).unsubscribeOn(threads.get(transaction));
+            boundService.cancelTransaction(transaction);
         }
-
-
-        /**
-         * Get the RXJava Observer object through which the TransactionResult is received.
-         *
-         * @param request
-         * @param callback the callback through which results are returned to the Presentation Layer
-         * @return
-         */
-        private Observer<TransactionResult> getSubscriber(final TransactionRequest request, final TransactionCallback callback) {
-            return new Observer<TransactionResult>() {
-                @Override
-                public void onSubscribe(@NonNull Disposable d) {
-                }
-
-                @Override
-                public void onNext(@NonNull TransactionResult result) {
-                    try {
-                        Log.d(TAG, "onNext: " + result);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    callback.onTransactionComplete(result);
-                    subscribers.remove(request);
-                }
-
-                @Override
-                public void onError(@NonNull Throwable e) {
-                    //normally we would do this but the endpoint is fake
-                    //so pass a fake transaciton result
-//                e.printStackTrace();
-//                callback.onError(e);
-                    TransactionResult result = getFakeResult(request);
-                    if (autosave) {
-                        try {
-                            TransactionContentProvider.DATABASE.saveTransactionToHistoryDatabase(result);
-                        } catch (Exception e1) {
-                            callback.onError(e);
-                        }
-                    }
-                    callback.onTransactionComplete(result);
-                }
-
-                @Override
-                public void onComplete() {
-                }
-            };
-        }
-
-        /**
-         * Get a fake result because there is no endpoint
-         *
-         * @return a fake {@link TransactionResult}
-         */
-        private TransactionResult getFakeResult(TransactionRequest request) {
-            TransactionResult result = new TransactionResult();
-            result.setTimestamp(System.currentTimeMillis() + "");
-            result.setAmount(request.getTotal());
-            result.setTransID("ABC123");
-            long response = Math.round(Math.random());
-            result.setResponse(response == 0 ? "Approved" : "Declined");
-            result.setResponseCode(response == 0 ? "A" : "D");
-            return result;
-        }
-
     }
+
 }

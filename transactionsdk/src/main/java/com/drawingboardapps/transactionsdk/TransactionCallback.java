@@ -18,4 +18,10 @@ public interface TransactionCallback {
      * @param e exception details
      */
     void onError(@NonNull Throwable e);
+
+//    /**
+//     * Called when the transaction is cancelled
+//     * @param byUser true if cancelled by user
+//     */
+//    void onTransactionCancelled(boolean byUser);
 }

@@ -18,4 +18,5 @@ interface PresenterDelegates {
     void doCancelTransaction(TransactionRequest transaction);
 
     Context getContext();
+
 }

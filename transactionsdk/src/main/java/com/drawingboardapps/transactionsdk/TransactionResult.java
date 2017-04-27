@@ -14,6 +14,7 @@ import io.realm.RealmObject;
 
 public class TransactionResult extends RealmObject implements Serializable {
 
+    public static String USER_CANCELLED = "user_cancelled";
     //    @SerializedName("transID")
 //    @Expose
     private String transID = "";
