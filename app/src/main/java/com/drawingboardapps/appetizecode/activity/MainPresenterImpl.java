@@ -5,6 +5,7 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.drawingboardapps.appetizecode.R;
 import com.drawingboardapps.appetizecode.databinding.ActivityDemoBinding;
 import com.drawingboardapps.appetizecode.fragments.BaseDialogFragment;
 import com.drawingboardapps.appetizecode.fragments.TransactionDialogFragment;
@@ -32,6 +33,9 @@ public class MainPresenterImpl implements MainPresenter {
         this.delegate = delegate;
     }
 
+    VMButtonBar buttonBar;
+    VMPriceInput priceBar;
+    VMKeyboard keyboard;
     /**
      * Given a {@link ActivityDemoBinding} bind a {@link VMKeyboard}, {@link VMPriceInput},
      * and {@link VMButtonBar}
@@ -39,13 +43,13 @@ public class MainPresenterImpl implements MainPresenter {
      * @param binding parent binding to which the elements should be bound
      */
     void initViews(@NonNull ActivityDemoBinding binding){
-        VMButtonBar buttonBar = initButtonBar(binding);
-        binding.setButtonBarModel(buttonBar);
+//        buttonBar = initButtonBar(binding);
+//        binding.setButtonBarModel(buttonBar);
 
-        VMPriceInput priceBar = initPriceBar(binding);
+        priceBar = initPriceBar(binding);
         binding.setPriceModel(priceBar);
 
-        VMKeyboard keyboard = initKeyboard(priceBar, binding);
+        keyboard = initKeyboard(priceBar, binding);
         binding.setKeyboardModel(keyboard);
     }
 
@@ -132,7 +136,13 @@ public class MainPresenterImpl implements MainPresenter {
             waitFragment.dismiss();
             waitFragment = null;
         }
+        resetPriceBar();
+        transaction = new Transaction();
         displayTransactionResults(transactionResult);
+    }
+
+    private void resetPriceBar() {
+        priceBar.setText(delegate.getContext().getString(R.string.hint_init_zero));
     }
 
     @Override
