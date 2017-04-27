@@ -6,7 +6,11 @@ package com.drawingboardapps.transactionsdk;
 
 import android.util.Log;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -16,6 +20,9 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.CompositeException;
 import io.reactivex.functions.Consumer;
+import io.reactivex.internal.functions.Functions;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -47,16 +54,25 @@ public final class TransactionHelper {
                 .build();
     }
 
-    protected void startTransaction(TransactionRequest request, final TransactionCallback callback, boolean autosave) {
+    protected void startTransaction(final TransactionRequest request,
+                                    final TransactionCallback callback,
+                                    final boolean autosave) {
+        //Test
+//        RxJavaPlugins.setErrorHandler(Functions.<Throwable>emptyConsumer());
+
         Log.d(TAG, "startTransaction: ");
         Retrofit retrofit = getClient(BASE_URL);
         TransactionAPI api = retrofit.create(TransactionAPI.class);
-        Observable<TransactionResult> observable = api.startTransaction(request);
+        final Observable<TransactionResult> observable = api.startTransaction(request);
+
         Scheduler cancelThread = AndroidSchedulers.mainThread();
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread());
         observable.subscribe(getSubscriber(request, callback, autosave));
 
+
+        // TODO: 4/27/2017 Switch above with below
+//        observable.subscribe(getSubscriber(request, callback, autosave));
 
         threads.put(request, cancelThread);
         subscribers.put(request, observable);
@@ -78,8 +94,8 @@ public final class TransactionHelper {
      * @return
      */
     private Observer<TransactionResult> getSubscriber(final TransactionRequest request,
-                                                      final TransactionCallback callback,
-                                                      final boolean autosave) {
+                                                       final TransactionCallback callback,
+                                                       final boolean autosave) {
         return new Observer<TransactionResult>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {

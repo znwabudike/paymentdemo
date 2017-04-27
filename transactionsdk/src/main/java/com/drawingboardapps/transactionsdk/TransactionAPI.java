@@ -1,8 +1,6 @@
 package com.drawingboardapps.transactionsdk;
 
 import io.reactivex.Observable;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
