@@ -26,17 +26,18 @@
             android:id="@+id/input_price_bar"
             layout="@layout/input_pice"
             bind:priceModel="@{priceModel}"
+            android:layout_above="@+id/input_keyboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <include
-            android:id="@+id/select_item_bar"
-            layout="@layout/button_bar"
-            bind:buttonBarModel="@{buttonBarModel}"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/input_price_bar"
-            android:layout_marginTop="16dp" />
+        <!--<include-->
+            <!--android:id="@+id/select_item_bar"-->
+            <!--layout="@layout/button_bar"-->
+            <!--bind:buttonBarModel="@{buttonBarModel}"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/input_price_bar"-->
+            <!--android:layout_marginTop="16dp" />-->
 
         <include
             android:id="@+id/input_keyboard"
