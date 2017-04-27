@@ -49,7 +49,7 @@ public class VMTransResult extends BaseObservable {
      */
     @Bindable
     public String getAmount() {
-        return result.getAmount();
+        return String.format("$%s",result.getAmount());
     }
 
     /**
