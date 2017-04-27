@@ -56,8 +56,9 @@ public final class TransactionSDK {
         serviceHelper.stopService(context);
     }
 
-    public void unbindService(Context context) {
-        serviceHelper.unbindService();
+    public void unbindService() {
+        if (serviceHelper.isServiceBound())
+            serviceHelper.unbindService();
     }
 
     public boolean bindService(Context context) {
@@ -94,7 +95,7 @@ public final class TransactionSDK {
         };
 
         private void startTransaction(TransactionRequest transaction, TransactionCallback callback) throws Exception {
-            if (! serviceBound) throw new Exception("Service not bound");
+            if (!serviceBound) throw new Exception("Service not bound");
             boundService.startTransaction(transaction, callback, autosave);
         }
 
@@ -114,7 +115,11 @@ public final class TransactionSDK {
 
         private void unbindService() {
             if (serviceBound)
-            boundService.unbindService(serviceConnection);
+                try {
+                    boundService.unbindService(serviceConnection);
+                } catch (IllegalArgumentException ex) {
+                    //service not bound
+                }
         }
 
         private boolean isServiceBound() {

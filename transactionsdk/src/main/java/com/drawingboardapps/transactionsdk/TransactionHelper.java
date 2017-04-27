@@ -14,6 +14,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.exceptions.CompositeException;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
@@ -23,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Helper class to facilitate everything for the transaction API calls
  */
-final class TransactionHelper {
+public final class TransactionHelper {
     private final String TAG = "TransactionHelper";
     private final String BASE_URL = "http://inchestilzachandjoreunite.com/";
 
@@ -54,12 +55,8 @@ final class TransactionHelper {
         Scheduler cancelThread = AndroidSchedulers.mainThread();
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread());
+        observable.subscribe(getSubscriber(request, callback, autosave));
 
-        try {
-            observable.subscribe(getSubscriber(request, callback, autosave));
-        }catch(Exception e){
-
-        }
 
         threads.put(request, cancelThread);
         subscribers.put(request, observable);
@@ -100,14 +97,15 @@ final class TransactionHelper {
             public void onError(@NonNull Throwable e) {
                 //normally we would do this but the endpoint is fake
                 //so pass a fake transaciton result
-//                callback.onError(e);
+                //callback.onError(e);
+
                 Log.d(TAG, "onError: ON ERROR CALLED");
                 TransactionResult result = getFakeResult(request, false);
                 if (autosave) {
                     try {
                         TransactionContentProvider.DATABASE.saveTransactionToHistoryDatabase(result);
                     } catch (Exception e1) {
-//                        callback.onError(e);
+                        callback.onError(e);
                     }
                 }
                 callback.onTransactionComplete(result);

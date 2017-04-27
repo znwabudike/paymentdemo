@@ -2,6 +2,7 @@ package com.drawingboardapps.transactionsdk;
 
 import android.content.ClipData;
 import android.support.annotation.IntRange;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ import io.realm.RealmObject;
 
 public class Transaction implements Serializable {
 
+    private static final String TAG = "Transaction";
     BigDecimal subtotal = new BigDecimal(0.0);
     BigDecimal tax = new BigDecimal(0.0);
     BigDecimal discount = new BigDecimal(0.0);

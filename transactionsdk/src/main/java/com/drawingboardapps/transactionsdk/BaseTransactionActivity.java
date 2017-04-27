@@ -38,7 +38,7 @@ public class BaseTransactionActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        TransactionContentProvider.SDK.unbindService(this);
+        TransactionContentProvider.SDK.unbindService();
         super.onStop();
     }
 

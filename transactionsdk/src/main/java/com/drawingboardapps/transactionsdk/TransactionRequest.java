@@ -30,7 +30,7 @@ public class TransactionRequest implements Serializable{
                               BigDecimal discount,
                               LinkedList<LineItem> lineitems,
                               String timeMillis) {
-
+        this.total = total.toString();
         this.subtotal = subtotal.toString();
         this.tax = tax.toString();
         this.discount = discount.toString();

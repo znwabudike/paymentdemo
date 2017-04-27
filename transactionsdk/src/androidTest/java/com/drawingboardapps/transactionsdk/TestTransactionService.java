@@ -38,12 +38,12 @@ import static junit.framework.Assert.assertTrue;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class TestTransactionSDK {
+public class TestTransactionService {
 
     private final int TEN_SECONDS = 10000;
     CountDownLatch latch;
     TransactionSDK sdk;
-    private String TAG = "TestTransactionSDK";
+    private String TAG = "TestTransactionService";
 
     @Rule
     public final ServiceTestRule mServiceRule = new ServiceTestRule();
@@ -55,8 +55,14 @@ public class TestTransactionSDK {
         sdk.bindService(InstrumentationRegistry.getContext());
     }
 
+
+    /**
+     * Test the application can bind with the service.
+     * Note, as soon as a call is made to the api an error is thrown,
+     * the test framework cannot catch the error so assertions will fail.
+     */
     @Test
-    public void testWithBoundService()  {
+    public void testServiceBindable()  {
         // Create the service Intent.
         Intent serviceIntent =
                 new Intent(InstrumentationRegistry.getTargetContext(),
@@ -74,9 +80,8 @@ public class TestTransactionSDK {
         TransactionService service =
                 ((TransactionService.BinderImpl) binder).getService();
         Log.d(TAG, "testWithBoundService: Service bound?" + service.isBound());
-        service.onDestroy();
         assertTrue(service.isBound());
-
+        service.onDestroy();
     }
 
     /*

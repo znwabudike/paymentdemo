@@ -44,7 +44,7 @@ public class VMTransResult extends BaseObservable {
     }
 
     /**
-     * Get the amouint of this transaction
+     * Get the amount of this transaction
      * @return
      */
     @Bindable

@@ -95,25 +95,21 @@ public final class TransactionContentProvider {
          * Unbind the service because it needs to survive application lifecycle, however, calling
          * this will cause SDK to become null.  The service must be initialized again.
          *
-         * @param context
          */
-        public static void onDestroy(Context context) {
+        public static void onDestroy() {
             if (sdk == null) return;
-            unbindService(context);
+            unbindService();
             sdk = null;
         }
 
         /**
          * Unbind the service from the context
          *
-         * @param context
          */
-        public static void unbindService(Context context) {
+        public static void unbindService() {
             if (sdk == null) return;
-            sdk.unbindService(context);
+            sdk.unbindService();
         }
-
-
     }
 
     public static class DATABASE {

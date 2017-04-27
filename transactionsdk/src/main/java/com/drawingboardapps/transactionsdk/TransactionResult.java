@@ -60,7 +60,7 @@ public class TransactionResult extends RealmObject implements Serializable {
     }
 
     /**
-     * Get the amouint of this transaction
+     * Get the amount of this transaction
      *
      * @return
      */
