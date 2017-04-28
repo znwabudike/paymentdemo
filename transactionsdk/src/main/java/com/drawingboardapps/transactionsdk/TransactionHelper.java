@@ -65,16 +65,41 @@ public final class TransactionHelper {
         TransactionAPI api = retrofit.create(TransactionAPI.class);
         final Observable<TransactionResult> observable = api.startTransaction(request);
 
-        Scheduler cancelThread = AndroidSchedulers.mainThread();
+        Scheduler subscribing = Schedulers.newThread();
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread());
-        observable.subscribe(getSubscriber(request, callback, autosave));
+//        observable.fromCallable()
+        observable.subscribe(getSubscruber());
 
+        subscribing.shutdown();
+
+        Observable<TransactionResult> ob = Observable.fromCallable(api.startTransactionCallable(request));
+        Observer<TransactionResult> ob2 = ob.subscribeWith(new Observer<TransactionResult>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(@NonNull TransactionResult transactionResult) {
+
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
 
         // TODO: 4/27/2017 Switch above with below
 //        observable.subscribe(getSubscriber(request, callback, autosave));
 
-        threads.put(request, cancelThread);
+        threads.put(request, subscribing);
         subscribers.put(request, observable);
     }
 
@@ -85,7 +110,79 @@ public final class TransactionHelper {
         threads.remove(transaction);
     }
 
+public Subscriber<TransactionResult> getSubscruber(){
+    return new Subscriber<TransactionResult>() {
+        @Override
+        public void onSubscribe(Subscription s) {
 
+        }
+
+        @Override
+        public void onNext(TransactionResult transactionResult) {
+
+        }
+
+        @Override
+        public void onError(Throwable t) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+    };
+}
+    private Subscription subMe(){
+        return new Subscription() {
+            @Override
+            public void request(long n) {
+
+            }
+
+            @Override
+            public void cancel() {
+
+            }
+        };
+    }
+
+    private abstract class TransactionConsumer implements Consumer<TransactionResult> {
+
+    }
+
+    private TransactionConsumer getTransactionConsumer(){
+        return new TransactionConsumer(){
+
+            @Override
+            public void accept(@NonNull TransactionResult transactionResult) throws Exception {
+
+            }
+        };
+    }
+    private Subscriber<TransactionResult> sub(){
+        return new Subscriber<TransactionResult>() {
+            @Override
+            public void onSubscribe(Subscription s) {
+
+            }
+
+            @Override
+            public void onNext(TransactionResult transactionResult) {
+
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+    }
     /**
      * Get the RXJava Observer object through which the TransactionResult is received.
      *

@@ -1,5 +1,7 @@
 package com.drawingboardapps.transactionsdk;
 
+import java.util.concurrent.Callable;
+
 import io.reactivex.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -12,4 +14,7 @@ interface TransactionAPI {
 
     @POST("/testapi/{request}")
     Observable<TransactionResult> startTransaction(@Body TransactionRequest request);
+
+    @POST("/testapi/{request}")
+    Callable<TransactionResult> startTransactionCallable(TransactionRequest request);
 }
