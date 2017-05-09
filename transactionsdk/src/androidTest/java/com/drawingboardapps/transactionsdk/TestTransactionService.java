@@ -152,8 +152,9 @@ public class TestTransactionService {
                 }
 
             });
-//            sdk.cancelTransaction(request);
+            sdk.cancelTransaction(request);
             latch.await(TEN_SECONDS, TimeUnit.MILLISECONDS);
+            Log.d(TAG, "testCancelTransaction: latch ended");
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertNotNull(null);
