@@ -4,6 +4,7 @@ package com.drawingboardapps.transactionsdk;
  * Created by Zach on 4/26/2017.
  */
 
+import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,8 +26,8 @@ public final class TransactionHelper {
     private final String TAG = "TransactionHelper";
     private final String BASE_URL = "http://inchestilzachandjoreunite.com/";
 
-    private ConcurrentHashMap<TransactionRequest, Observable> subscribers = new ConcurrentHashMap<>();
     private ConcurrentHashMap<TransactionRequest, Disposable> disposables = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<TransactionRequest, TransactionObserver> observers = new ConcurrentHashMap<>();
 
     /**
      * Create a simple retrofit client, interceptor and security intentionally
@@ -53,15 +54,18 @@ public final class TransactionHelper {
         TransactionAPI api = retrofit.create(TransactionAPI.class);
         final Observable<TransactionResult> observable = api.startTransaction(request);
 
+        TransactionObserver transactionObserver = getSubscriber(request, callback, autosave);
+        observers.put(request,transactionObserver);
         observable.observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.newThread()).subscribeWith(getSubscriber(request, callback, autosave));
+                .subscribeOn(Schedulers.newThread()).subscribeWith(transactionObserver);
 
     }
 
     public void cancelTransaction(TransactionRequest transaction) {
-        Log.d(TAG, "cancelTransaction: called on " + disposables.get(transaction));
         disposables.get(transaction).dispose();
+        Log.d(TAG, "cancelTransaction: called on " + disposables.get(transaction));
         disposables.remove(transaction);
+        observers.remove(transaction).onCancelled();
     }
 
     /**
@@ -71,10 +75,10 @@ public final class TransactionHelper {
      * @param callback the callback through which results are returned to the Presentation Layer
      * @return
      */
-    private Observer<TransactionResult> getSubscriber(final TransactionRequest request,
+    private TransactionObserver getSubscriber(final TransactionRequest request,
                                                       final TransactionCallback callback,
                                                       final boolean autosave) {
-        return new Observer<TransactionResult>() {
+        return new TransactionObserver() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
                 disposables.put(request, d);
@@ -84,8 +88,6 @@ public final class TransactionHelper {
             public void onNext(@NonNull TransactionResult result) {
                 Log.d(TAG, "onNext: " + result);
                 callback.onTransactionComplete(result);
-                subscribers.remove(request);
-                disposables.remove(request);
             }
 
             @Override
@@ -108,6 +110,16 @@ public final class TransactionHelper {
 
             @Override
             public void onComplete() {
+                Log.d(TAG, "onComplete: called");
+                disposables.remove(request);
+            }
+
+            @Override
+            public void onCancelled() {
+                Log.d(TAG, "onCancelled: called");
+                TransactionResult result = new TransactionResult();
+                result.setResponse(TransactionResult.USER_CANCELLED);
+                callback.onTransactionComplete(result);
             }
         };
     }
@@ -127,6 +139,33 @@ public final class TransactionHelper {
         result.setResponse(response == 0 ? "Approved" : "Declined");
         result.setResponseCode(response == 0 ? "A" : "D");
         return result;
+    }
+
+
+
+    public abstract class TransactionObserver implements Observer<TransactionResult> {
+
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+
+        }
+
+        @Override
+        public void onNext(@NonNull TransactionResult transactionResult) {
+
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+
+        public abstract void onCancelled();
     }
 }
 

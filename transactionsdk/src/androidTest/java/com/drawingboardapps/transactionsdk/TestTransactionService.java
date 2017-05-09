@@ -128,8 +128,10 @@ public class TestTransactionService {
 //        }
 //    }
 //
+    volatile boolean onAGoodNote = false;
     @Test
     public void testCancelTransaction() {
+
         try {
             Transaction transaction = new Transaction();
             transaction.setSubtotal("$1.00");
@@ -141,6 +143,8 @@ public class TestTransactionService {
                     Assert.assertNotNull(transactionResult);
                     Assert.assertNotNull(transactionResult.getResponse());
                     Assert.assertEquals(TransactionResult.USER_CANCELLED, transactionResult.getResponse());
+                    Log.d(TAG, "testCancelTransaction: latchcountdown");
+                    onAGoodNote = true;
                     latch.countDown();
                 }
 
@@ -154,7 +158,7 @@ public class TestTransactionService {
             });
             sdk.cancelTransaction(request);
             latch.await(TEN_SECONDS, TimeUnit.MILLISECONDS);
-            Log.d(TAG, "testCancelTransaction: latch ended");
+            Log.d(TAG, "testCancelTransaction: latch ended onAGoodNote? " + onAGoodNote);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertNotNull(null);
