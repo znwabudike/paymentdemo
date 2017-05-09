@@ -19,6 +19,7 @@ public final class TransactionSDK {
     private final boolean autosave;
     private boolean serviceBound;
     private TransactionHelper transactionHelper;
+    private TransactionService service;
 
     public TransactionSDK(boolean autosave) {
         this.autosave = autosave;
@@ -37,6 +38,10 @@ public final class TransactionSDK {
     public void startTransaction(TransactionRequest request,
                                  final TransactionCallback callback) throws Exception {
         serviceHelper.startTransaction(request, callback);
+    }
+
+    public void setService(TransactionService service) {
+        this.serviceHelper.setService(service);
     }
 
     public void cancelTransaction(TransactionRequest transaction) {
@@ -82,7 +87,7 @@ public final class TransactionSDK {
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 Log.d(TAG, "onServiceDisconnected: ");
-                serviceBound = false;
+                serviceBound = isServiceBound();
             }
 
             @Override
@@ -90,12 +95,12 @@ public final class TransactionSDK {
                 Log.d(TAG, "onServiceConnected: ");
                 TransactionService.BinderImpl myBinder = (TransactionService.BinderImpl) service;
                 boundService = myBinder.getService();
-                serviceBound = true;
+                serviceBound = isServiceBound();
             }
         };
 
         private void startTransaction(TransactionRequest transaction, TransactionCallback callback) throws Exception {
-            if (!serviceBound) throw new Exception("Service not bound");
+            if (!isServiceBound()) throw new Exception("Service not bound");
             boundService.startTransaction(transaction, callback, autosave);
         }
 
@@ -123,11 +128,16 @@ public final class TransactionSDK {
         }
 
         private boolean isServiceBound() {
+            serviceBound = (boundService != null && boundService.isBound());
             return serviceBound;
         }
 
         public void cancelTransaction(TransactionRequest transaction) {
             boundService.cancelTransaction(transaction);
+        }
+
+        public void setService(TransactionService service) {
+            this.boundService = service;
         }
     }
 

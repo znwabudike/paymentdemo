@@ -56,13 +56,19 @@ public class TestTransactionService {
     }
 
 
-    /**
-     * Test the application can bind with the service.
-     * Note, as soon as a call is made to the api an error is thrown,
-     * the test framework cannot catch the error so assertions will fail.
-     */
-    @Test
-    public void testServiceBindable()  {
+//    /**
+//     * Test the application can bind with the service.
+//     * Note, as soon as a call is made to the api an error is thrown,
+//     * the test framework cannot catch the error so assertions will fail.
+//     */
+//    @Test
+//    public void testServiceBindable()  {
+//        TransactionService service = bindService();
+//        assertTrue(service.isBound());
+//        service.onDestroy();
+//    }
+//
+    private TransactionService bindService() {
         // Create the service Intent.
         Intent serviceIntent =
                 new Intent(InstrumentationRegistry.getTargetContext(),
@@ -80,8 +86,7 @@ public class TestTransactionService {
         TransactionService service =
                 ((TransactionService.BinderImpl) binder).getService();
         Log.d(TAG, "testWithBoundService: Service bound?" + service.isBound());
-        assertTrue(service.isBound());
-        service.onDestroy();
+        return service;
     }
 
     /*
@@ -123,34 +128,36 @@ public class TestTransactionService {
 //        }
 //    }
 //
-//    @Test
-//    public void testCancelTransaction() {
-//        try {
-//            Transaction transaction = new Transaction();
-//            transaction.setSubtotal("$1.00");
-//            final TransactionRequest request = transaction.buildRequest();
-//            sdk.startTransaction(request, new TransactionCallback() {
-//                @Override
-//                public void onTransactionComplete(@NonNull TransactionResult transactionResult) {
-//                    Assert.assertNotNull(transactionResult);
-//                    Assert.assertNotNull(transactionResult.getResponse());
-//                    Assert.assertEquals(transactionResult.getResponse(), TransactionResult.USER_CANCELLED);
-//                    latch.countDown();
-//                }
-//
-//                @Override
-//                public void onError(@NonNull Throwable e) {
-//                    Log.e(TAG, "onError: ", e);
-//                    assertNotNull(null);
-//                    latch.countDown();
-//                }
-//
-//            });
-//
-//            latch.await(TEN_SECONDS, TimeUnit.MILLISECONDS);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Assert.assertNotNull(null);
-//        }
-//    }
+    @Test
+    public void testCancelTransaction() {
+        try {
+            Transaction transaction = new Transaction();
+            transaction.setSubtotal("$1.00");
+            final TransactionRequest request = transaction.buildRequest();
+            sdk.setService(bindService());
+            sdk.startTransaction(request, new TransactionCallback() {
+                @Override
+                public void onTransactionComplete(@NonNull TransactionResult transactionResult) {
+                    Assert.assertNotNull(transactionResult);
+                    Assert.assertNotNull(transactionResult.getResponse());
+                    Assert.assertEquals(TransactionResult.USER_CANCELLED, transactionResult.getResponse());
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+                    Log.e(TAG, "onError: ", e);
+                    assertNotNull(null);
+                    latch.countDown();
+                }
+
+            });
+//            sdk.cancelTransaction(request);
+            latch.await(TEN_SECONDS, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertNotNull(null);
+        }
+
+    }
 }
